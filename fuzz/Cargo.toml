@@ -1,0 +1,30 @@
+
+[package]
+name = "rsdparsa-fuzz"
+version = "0.0.1"
+authors = ["Automatically generated"]
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies.rsdparsa]
+path = ".."
+[dependencies.libfuzzer-sys]
+git = "https://github.com/rust-fuzz/libfuzzer-sys.git"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "fuzz_target_attribute"
+path = "fuzz_targets/fuzz_target_attribute.rs"
+
+[[bin]]
+name = "fuzz_target_media"
+path = "fuzz_targets/fuzz_target_media.rs"
+
+[[bin]]
+name = "fuzz_target_all"
+path = "fuzz_targets/fuzz_target_all.rs"
