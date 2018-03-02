@@ -4,7 +4,7 @@ use std::fmt;
 use std::error;
 use std::error::Error;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SdpParserInternalError {
     Generic(String),
     Unsupported(String),
@@ -34,8 +34,8 @@ impl fmt::Display for SdpParserInternalError {
 impl error::Error for SdpParserInternalError {
     fn description(&self) -> &str {
         match *self {
-            SdpParserInternalError::Generic(ref message) |
-            SdpParserInternalError::Unsupported(ref message) => message,
+            SdpParserInternalError::Generic(ref message)
+            | SdpParserInternalError::Unsupported(ref message) => message,
             SdpParserInternalError::Integer(ref error) => error.description(),
             SdpParserInternalError::Address(ref error) => error.description(),
         }
@@ -54,18 +54,22 @@ impl error::Error for SdpParserInternalError {
 #[test]
 fn test_sdp_parser_internal_error_generic() {
     let generic = SdpParserInternalError::Generic("generic message".to_string());
-    assert_eq!(format!("{}", generic),
-               "Generic parsing error: generic message");
+    assert_eq!(
+        format!("{}", generic),
+        "Generic parsing error: generic message"
+    );
     assert_eq!(generic.description(), "generic message");
     assert!(generic.cause().is_none());
 }
 
 #[test]
 fn test_sdp_parser_internal_error_unsupported() {
-    let unsupported = SdpParserInternalError::Unsupported("unsupported internal message"
-                                                              .to_string());
-    assert_eq!(format!("{}", unsupported),
-               "Unsupported parsing error: unsupported internal message");
+    let unsupported =
+        SdpParserInternalError::Unsupported("unsupported internal message".to_string());
+    assert_eq!(
+        format!("{}", unsupported),
+        "Unsupported parsing error: unsupported internal message"
+    );
     assert_eq!(unsupported.description(), "unsupported internal message");
     assert!(unsupported.cause().is_none());
 }
@@ -76,8 +80,10 @@ fn test_sdp_parser_internal_error_integer() {
     let integer = v.parse::<u64>();
     assert!(integer.is_err());
     let int_err = SdpParserInternalError::Integer(integer.err().unwrap());
-    assert_eq!(format!("{}", int_err),
-               "Integer parsing error: invalid digit found in string");
+    assert_eq!(
+        format!("{}", int_err),
+        "Integer parsing error: invalid digit found in string"
+    );
     assert_eq!(int_err.description(), "invalid digit found in string");
     assert!(!int_err.cause().is_none());
 }
@@ -90,13 +96,15 @@ fn test_sdp_parser_internal_error_address() {
     let addr = IpAddr::from_str(v);
     assert!(addr.is_err());
     let addr_err = SdpParserInternalError::Address(addr.err().unwrap());
-    assert_eq!(format!("{}", addr_err),
-               "IP address parsing error: invalid IP address syntax");
+    assert_eq!(
+        format!("{}", addr_err),
+        "IP address parsing error: invalid IP address syntax"
+    );
     assert_eq!(addr_err.description(), "invalid IP address syntax");
     assert!(!addr_err.cause().is_none());
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SdpParserError {
     Line {
         error: SdpParserInternalError,
@@ -108,7 +116,10 @@ pub enum SdpParserError {
         line: String,
         line_number: usize,
     },
-    Sequence { message: String, line_number: usize },
+    Sequence {
+        message: String,
+        line_number: usize,
+    },
 }
 
 impl fmt::Display for SdpParserError {
@@ -118,24 +129,24 @@ impl fmt::Display for SdpParserError {
                 ref error,
                 ref line,
                 ref line_number,
-            } => {
-                write!(f,
-                       "Line error: {} in line({}): {}",
-                       error.description(),
-                       line_number,
-                       line)
-            }
+            } => write!(
+                f,
+                "Line error: {} in line({}): {}",
+                error.description(),
+                line_number,
+                line
+            ),
             SdpParserError::Unsupported {
                 ref error,
                 ref line,
                 ref line_number,
-            } => {
-                write!(f,
-                       "Unsupported: {} in line({}): {}",
-                       error.description(),
-                       line_number,
-                       line)
-            }
+            } => write!(
+                f,
+                "Unsupported: {} in line({}): {}",
+                error.description(),
+                line_number,
+                line
+            ),
             SdpParserError::Sequence {
                 ref message,
                 ref line_number,
@@ -144,20 +155,42 @@ impl fmt::Display for SdpParserError {
     }
 }
 
+impl SdpParserError {
+    pub fn get_line_number(&self) -> usize {
+        *match *self {
+            SdpParserError::Line {
+                ref line_number, ..
+            } => line_number,
+            SdpParserError::Unsupported {
+                ref line_number, ..
+            } => line_number,
+            SdpParserError::Sequence {
+                ref line_number, ..
+            } => line_number,
+        }
+    }
+    pub fn get_message(&self) -> String {
+        match *self {
+            SdpParserError::Line { ref error, .. } => format!("{}", error),
+            SdpParserError::Unsupported { ref error, .. } => format!("{}", error),
+            SdpParserError::Sequence { ref message, .. } => message.clone(),
+        }
+    }
+}
 
 impl error::Error for SdpParserError {
     fn description(&self) -> &str {
         match *self {
-            SdpParserError::Line { ref error, .. } |
-            SdpParserError::Unsupported { ref error, .. } => error.description(),
+            SdpParserError::Line { ref error, .. }
+            | SdpParserError::Unsupported { ref error, .. } => error.description(),
             SdpParserError::Sequence { ref message, .. } => message,
         }
     }
 
     fn cause(&self) -> Option<&error::Error> {
         match *self {
-            SdpParserError::Line { ref error, .. } |
-            SdpParserError::Unsupported { ref error, .. } => Some(error),
+            SdpParserError::Line { ref error, .. }
+            | SdpParserError::Unsupported { ref error, .. } => Some(error),
             // Can't tell much more about our internal errors
             _ => None,
         }
@@ -183,8 +216,10 @@ fn test_sdp_parser_error_line() {
         line: "test line".to_string(),
         line_number: 13,
     };
-    assert_eq!(format!("{}", line1),
-               "Line error: test message in line(13): test line");
+    assert_eq!(
+        format!("{}", line1),
+        "Line error: test message in line(13): test line"
+    );
     assert_eq!(line1.description(), "test message");
     assert!(line1.cause().is_some());
 }
@@ -196,8 +231,10 @@ fn test_sdp_parser_error_unsupported() {
         line: "unsupported line".to_string(),
         line_number: 21,
     };
-    assert_eq!(format!("{}", unsupported1),
-               "Unsupported: unsupported value in line(21): unsupported line");
+    assert_eq!(
+        format!("{}", unsupported1),
+        "Unsupported: unsupported value in line(21): unsupported line"
+    );
     assert_eq!(unsupported1.description(), "unsupported value");
     assert!(unsupported1.cause().is_some());
 }
@@ -208,8 +245,10 @@ fn test_sdp_parser_error_sequence() {
         message: "sequence message".to_string(),
         line_number: 42,
     };
-    assert_eq!(format!("{}", sequence1),
-               "Sequence error in line(42): sequence message");
+    assert_eq!(
+        format!("{}", sequence1),
+        "Sequence error in line(42): sequence message"
+    );
     assert_eq!(sequence1.description(), "sequence message");
     assert!(sequence1.cause().is_none());
 }

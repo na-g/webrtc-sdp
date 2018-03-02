@@ -3,8 +3,13 @@ name = "rsdparsa"
 version = "0.1.0"
 authors = ["Nils Ohlmeier <github@ohlmeier.org>"]
 
+# Need to build this as a dynamic library for wasm
+[lib]
+crate-type = ["cdylib"]
+
 [dependencies]
 clippy = {version = "*", optional = true}
+wasm-bindgen = { git = 'https://github.com/alexcrichton/wasm-bindgen' }
 
 [features]
 default = []

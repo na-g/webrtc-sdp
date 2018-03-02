@@ -19,11 +19,15 @@ m=audio 0 UDP/TLS/RTP/SAVPF 0\r\n";
     assert_eq!(sdp.media.len(), 1);
 
     let msection = &(sdp.media[0]);
-    assert_eq!(*msection.get_type(),
-               rsdparsa::media_type::SdpMediaValue::Audio);
+    assert_eq!(
+        *msection.get_type(),
+        rsdparsa::media_type::SdpMediaValue::Audio
+    );
     assert_eq!(msection.get_port(), 0);
-    assert_eq!(*msection.get_proto(),
-               rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf);
+    assert_eq!(
+        *msection.get_proto(),
+        rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf
+    );
     assert!(!msection.has_attributes());
     assert!(!msection.has_bandwidth());
     assert!(!msection.has_connection());
@@ -105,11 +109,15 @@ a=ssrc:2655508255 cname:{735484ea-4f6c-f74a-bd66-7425f8476c2e}\r\n";
     assert_eq!(sdp.media.len(), 1);
 
     let msection = &(sdp.media[0]);
-    assert_eq!(*msection.get_type(),
-               rsdparsa::media_type::SdpMediaValue::Audio);
+    assert_eq!(
+        *msection.get_type(),
+        rsdparsa::media_type::SdpMediaValue::Audio
+    );
     assert_eq!(msection.get_port(), 9);
-    assert_eq!(*msection.get_proto(),
-               rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf);
+    assert_eq!(
+        *msection.get_proto(),
+        rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf
+    );
     assert!(msection.has_attributes());
     assert!(msection.has_connection());
     assert!(msection.get_connection().is_some());
@@ -162,11 +170,15 @@ a=ssrc:2709871439 cname:{735484ea-4f6c-f74a-bd66-7425f8476c2e}";
     assert_eq!(sdp.media.len(), 1);
 
     let msection = &(sdp.media[0]);
-    assert_eq!(*msection.get_type(),
-               rsdparsa::media_type::SdpMediaValue::Video);
+    assert_eq!(
+        *msection.get_type(),
+        rsdparsa::media_type::SdpMediaValue::Video
+    );
     assert_eq!(msection.get_port(), 9);
-    assert_eq!(*msection.get_proto(),
-               rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf);
+    assert_eq!(
+        *msection.get_proto(),
+        rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf
+    );
 }
 
 #[test]
@@ -199,11 +211,15 @@ a=ssrc:3376683177 cname:{62f78ee0-620f-a043-86ca-b69f189f1aea}\r\n";
     assert_eq!(sdp.media.len(), 1);
 
     let msection = &(sdp.media[0]);
-    assert_eq!(*msection.get_type(),
-               rsdparsa::media_type::SdpMediaValue::Application);
+    assert_eq!(
+        *msection.get_type(),
+        rsdparsa::media_type::SdpMediaValue::Application
+    );
     assert_eq!(msection.get_port(), 49760);
-    assert_eq!(*msection.get_proto(),
-               rsdparsa::media_type::SdpProtocolValue::DtlsSctp);
+    assert_eq!(
+        *msection.get_proto(),
+        rsdparsa::media_type::SdpProtocolValue::DtlsSctp
+    );
 }
 
 #[test]
@@ -304,21 +320,29 @@ a=ssrc:2673335628 label:b6ec5178-c611-403f-bbec-3833ed547c09\r\n";
     assert_eq!(sdp.media.len(), 2);
 
     let msection1 = &(sdp.media[0]);
-    assert_eq!(*msection1.get_type(),
-               rsdparsa::media_type::SdpMediaValue::Audio);
+    assert_eq!(
+        *msection1.get_type(),
+        rsdparsa::media_type::SdpMediaValue::Audio
+    );
     assert_eq!(msection1.get_port(), 9);
-    assert_eq!(*msection1.get_proto(),
-               rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf);
+    assert_eq!(
+        *msection1.get_proto(),
+        rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf
+    );
     assert!(msection1.has_attributes());
     assert!(msection1.has_connection());
     assert!(!msection1.has_bandwidth());
 
     let msection2 = &(sdp.media[1]);
-    assert_eq!(*msection2.get_type(),
-               rsdparsa::media_type::SdpMediaValue::Video);
+    assert_eq!(
+        *msection2.get_type(),
+        rsdparsa::media_type::SdpMediaValue::Video
+    );
     assert_eq!(msection2.get_port(), 9);
-    assert_eq!(*msection2.get_proto(),
-               rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf);
+    assert_eq!(
+        *msection2.get_proto(),
+        rsdparsa::media_type::SdpProtocolValue::UdpTlsRtpSavpf
+    );
     assert!(msection2.has_attributes());
     assert!(msection2.has_connection());
     assert!(!msection2.has_bandwidth());
