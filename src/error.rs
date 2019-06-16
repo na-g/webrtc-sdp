@@ -39,16 +39,6 @@ impl fmt::Display for SdpParserInternalError {
 }
 
 impl error::Error for SdpParserInternalError {
-    fn description(&self) -> &str {
-        match *self {
-            SdpParserInternalError::Generic(ref message)
-            | SdpParserInternalError::Unsupported(ref message) => message,
-            SdpParserInternalError::Integer(ref error) => error.description(),
-            SdpParserInternalError::Float(ref error) => error.description(),
-            SdpParserInternalError::Address(ref error) => error.description(),
-        }
-    }
-
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
             SdpParserInternalError::Integer(ref error) => Some(error),
@@ -136,8 +126,8 @@ impl fmt::Display for SdpParserError {
                 ref line_number,
             } => write!(
                 f,
-                "Line error: {} in line({}): {}",
-                error.description(),
+                "Line error: {:?} in line({}): {}",
+                error,
                 line_number,
                 line
             ),
@@ -147,8 +137,8 @@ impl fmt::Display for SdpParserError {
                 ref line_number,
             } => write!(
                 f,
-                "Unsupported: {} in line({}): {}",
-                error.description(),
+                "Unsupported: {:?} in line({}): {}",
+                error,
                 line_number,
                 line
             ),
@@ -161,14 +151,6 @@ impl fmt::Display for SdpParserError {
 }
 
 impl error::Error for SdpParserError {
-    fn description(&self) -> &str {
-        match *self {
-            SdpParserError::Line { ref error, .. }
-            | SdpParserError::Unsupported { ref error, .. } => error.description(),
-            SdpParserError::Sequence { ref message, .. } => message,
-        }
-    }
-
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
             SdpParserError::Line { ref error, .. }
@@ -208,7 +190,6 @@ mod tests {
             format!("{}", generic),
             "Generic parsing error: generic message"
         );
-        assert_eq!(generic.description(), "generic message");
         assert!(generic.source().is_none());
     }
 
@@ -220,7 +201,6 @@ mod tests {
             format!("{}", unsupported),
             "Unsupported parsing error: unsupported internal message"
         );
-        assert_eq!(unsupported.description(), "unsupported internal message");
         assert!(unsupported.source().is_none());
     }
 
