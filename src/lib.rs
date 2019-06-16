@@ -588,6 +588,7 @@ fn parse_sdp_line(line: &str, line_number: usize) -> Result<SdpLine, SdpParserEr
     })
     .map_err(|e| match e {
         SdpParserInternalError::Generic(..)
+        | SdpParserInternalError::MissingToken{..}
         | SdpParserInternalError::Integer(..)
         | SdpParserInternalError::Float(..)
         | SdpParserInternalError::Address(..) => SdpParserError::Line {
