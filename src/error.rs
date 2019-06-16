@@ -10,7 +10,7 @@ use std::num::ParseIntError;
 #[derive(Debug, Clone)]
 pub enum SdpParserInternalError {
     Generic(String),
-    MissingToken{context:String, token:String},
+    MissingToken { context: String, token: String },
     Unsupported(String),
     Integer(ParseIntError),
     Float(ParseFloatError),
@@ -26,9 +26,14 @@ impl fmt::Display for SdpParserInternalError {
             SdpParserInternalError::Unsupported(ref message) => {
                 write!(f, "Unsupported parsing error: {}", message)
             }
-            SdpParserInternalError::MissingToken{ref context, ref token} => {
-                write!(f, "Missing token error: '{}' requires a '{}' token", context, token)
-            }
+            SdpParserInternalError::MissingToken {
+                ref context,
+                ref token,
+            } => write!(
+                f,
+                "Missing token error: '{}' requires a '{}' token",
+                context, token
+            ),
             SdpParserInternalError::Integer(ref error) => {
                 write!(f, "Integer parsing error: {}", error.description())
             }
@@ -131,9 +136,7 @@ impl fmt::Display for SdpParserError {
             } => write!(
                 f,
                 "Line error: {:?} in line({}): {}",
-                error,
-                line_number,
-                line
+                error, line_number, line
             ),
             SdpParserError::Unsupported {
                 ref error,
@@ -142,9 +145,7 @@ impl fmt::Display for SdpParserError {
             } => write!(
                 f,
                 "Unsupported: {:?} in line({}): {}",
-                error,
-                line_number,
-                line
+                error, line_number, line
             ),
             SdpParserError::Sequence {
                 ref message,

@@ -419,17 +419,19 @@ fn parse_origin(value: &str) -> Result<SdpType, SdpParserInternalError> {
 }
 
 fn parse_connection(value: &str) -> Result<SdpType, SdpParserInternalError> {
-    let cv: Vec<&str> = value.split_whitespace().collect();
-    if cv.len() != 3 {
-        return Err(SdpParserInternalError::Generic(
-            "connection attribute must have three tokens".to_string(),
-        ));
-    }
-    parse_network_type(cv[0])?;
-    let addrtype = parse_address_type(cv[1])?;
+    let mut cv = value.split_whitespace().peekable();
+    let mut next_token = |token: &str| {
+        cv.next().ok_or(SdpParserInternalError::MissingToken {
+            context: "connection".to_owned(),
+            token: token.to_owned(),
+        })
+    };
+    let net_type = next_token("net-type")?;
+    parse_network_type(net_type)?;
+    let addrtype = parse_address_type(next_token("address-type")?)?;
     let mut ttl = None;
     let mut amount = None;
-    let mut addr_token = cv[2];
+    let mut addr_token = next_token("address")?;
     if addr_token.find('/') != None {
         let addr_tokens: Vec<&str> = addr_token.split('/').collect();
         if addr_tokens.len() >= 3 {
@@ -588,7 +590,7 @@ fn parse_sdp_line(line: &str, line_number: usize) -> Result<SdpLine, SdpParserEr
     })
     .map_err(|e| match e {
         SdpParserInternalError::Generic(..)
-        | SdpParserInternalError::MissingToken{..}
+        | SdpParserInternalError::MissingToken { .. }
         | SdpParserInternalError::Integer(..)
         | SdpParserInternalError::Float(..)
         | SdpParserInternalError::Address(..) => SdpParserError::Line {
