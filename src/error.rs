@@ -11,6 +11,7 @@ use std::num::ParseIntError;
 pub enum SdpParserInternalError {
     Generic(String),
     MissingToken { context: String, token: String },
+    UnexpectedTokens { number: usize },
     Unsupported(String),
     Integer(ParseIntError),
     Float(ParseFloatError),
@@ -34,6 +35,9 @@ impl fmt::Display for SdpParserInternalError {
                 "Missing token error: '{}' requires a '{}' token",
                 context, token
             ),
+            SdpParserInternalError::UnexpectedTokens { ref number } => {
+                write!(f, "Unexpected {} additional tokens:", number)
+            }
             SdpParserInternalError::Integer(ref error) => {
                 write!(f, "Integer parsing error: {}", error.description())
             }
@@ -144,7 +148,7 @@ impl fmt::Display for SdpParserError {
                 ref line_number,
             } => write!(
                 f,
-                "Unsupported: {:?} in line({}): {}",
+                "Unsupported: {} in line({}): {}",
                 error, line_number, line
             ),
             SdpParserError::Sequence {
@@ -219,7 +223,6 @@ mod tests {
             format!("{}", int_err),
             "Integer parsing error: invalid digit found in string"
         );
-        assert_eq!(int_err.description(), "invalid digit found in string");
         assert!(!int_err.source().is_none());
     }
 
@@ -233,7 +236,6 @@ mod tests {
             format!("{}", int_err),
             "Float parsing error: invalid float literal"
         );
-        assert_eq!(int_err.description(), "invalid float literal");
         assert!(!int_err.source().is_none());
     }
 
@@ -249,7 +251,6 @@ mod tests {
             format!("{}", addr_err),
             "IP address parsing error: invalid IP address syntax"
         );
-        assert_eq!(addr_err.description(), "invalid IP address syntax");
         assert!(!addr_err.source().is_none());
     }
 
@@ -262,24 +263,22 @@ mod tests {
         };
         assert_eq!(
             format!("{}", line1),
-            "Line error: test message in line(13): test line"
+            "Line error: Generic(\"test message\") in line(13): test line"
         );
-        assert_eq!(line1.description(), "test message");
         assert!(line1.source().is_some());
     }
 
     #[test]
     fn test_sdp_parser_error_unsupported() {
         let unsupported1 = SdpParserError::Unsupported {
-            error: SdpParserInternalError::Generic("unsupported value".to_string()),
+            error: SdpParserInternalError::Unsupported("unsupported value".to_string()),
             line: "unsupported line".to_string(),
             line_number: 21,
         };
         assert_eq!(
             format!("{}", unsupported1),
-            "Unsupported: unsupported value in line(21): unsupported line"
+            "Unsupported: Unsupported parsing error: unsupported value in line(21): unsupported line"
         );
-        assert_eq!(unsupported1.description(), "unsupported value");
         assert!(unsupported1.source().is_some());
     }
 
@@ -293,7 +292,6 @@ mod tests {
             format!("{}", sequence1),
             "Sequence error in line(42): sequence message"
         );
-        assert_eq!(sequence1.description(), "sequence message");
         assert!(sequence1.source().is_none());
     }
 }

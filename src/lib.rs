@@ -451,6 +451,10 @@ fn parse_connection(value: &str) -> Result<SdpType, SdpParserInternalError> {
         ttl,
         amount,
     };
+    let number = cv.count();
+    if number != 0 {
+        return Err(SdpParserInternalError::UnexpectedTokens { number });
+    }
     trace!("connection: {}", c.address);
     Ok(SdpType::Connection(c))
 }
@@ -591,6 +595,7 @@ fn parse_sdp_line(line: &str, line_number: usize) -> Result<SdpLine, SdpParserEr
     .map_err(|e| match e {
         SdpParserInternalError::Generic(..)
         | SdpParserInternalError::MissingToken { .. }
+        | SdpParserInternalError::UnexpectedTokens { .. }
         | SdpParserInternalError::Integer(..)
         | SdpParserInternalError::Float(..)
         | SdpParserInternalError::Address(..) => SdpParserError::Line {
