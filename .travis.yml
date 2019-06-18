@@ -10,11 +10,11 @@ env:
   - FEATURES=""
   - FEATURES="serialize"
 rust:
+  # minimum stable version
+  - 1.30.0
   - nightly
   - beta
   - stable
-  # minimum stable version
-  - 1.30.0
 
 matrix:
   allow_failures:
