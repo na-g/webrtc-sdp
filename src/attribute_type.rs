@@ -544,7 +544,7 @@ impl fmt::Display for SdpAttributeExtmap {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 #[cfg_attr(feature = "serialize", derive(Serialize))]
 pub struct RtxFmtpParameters {
     pub apt: u8,
