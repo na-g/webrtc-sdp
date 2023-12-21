@@ -177,6 +177,10 @@ impl SdpMedia {
         &self.media.proto
     }
 
+    pub fn set_proto(&mut self, proto: SdpProtocolValue) {
+        self.media.proto = proto;
+    }
+
     pub fn get_formats(&self) -> &SdpFormatList {
         &self.media.formats
     }
